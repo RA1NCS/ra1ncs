@@ -259,6 +259,9 @@ def render(stats, theme):
     panel_x = int(pad_x + (art_w + 4) * char_w)
     total_w = int(panel_x + 70 * char_w + pad_x)
     base_y = pad_y + 14
+    # vertically center the shorter block against the taller one
+    art_y_offset = max(0, (rows - art_h) // 2) * line_h
+    panel_y_offset = max(0, (rows - panel_h) // 2) * line_h
 
     parts = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{total_w}" height="{total_h}" '
@@ -269,14 +272,14 @@ def render(stats, theme):
 
     # ascii art on the left
     for i, line in enumerate(ART):
-        y = base_y + i * line_h
+        y = base_y + art_y_offset + i * line_h
         parts.append(
             f'<text x="{art_x}" y="{y}" fill="{p["art"]}" stroke="{p["art"]}" stroke-width="0.9" paint-order="stroke fill" font-family="Menlo, Monaco, Courier New, monospace" font-weight="900" xml:space="preserve">{esc(line)}</text>'
         )
 
     # neofetch panel on the right
     for i, entry in enumerate(panel):
-        y = base_y + i * line_h
+        y = base_y + panel_y_offset + i * line_h
         kind = entry[0]
         if kind == "header":
             parts.append(
