@@ -201,26 +201,28 @@ THEMES = {
     "dark": {
         "bg": "#0d1117",
         "border": "#30363d",
-        "fg": "#c9d1d9",
-        "label": "#cc6666",
-        "value": "#79b8ff",
-        "dim": "#6e7681",
-        "accent": "#cc6666",
-        "art": "#8b949e",
-        "plus": "#7ee787",
-        "minus": "#ff7b72",
+        "fg": "#8b949e",
+        "label": "#9a4c4c",
+        "value": "#4f7fbf",
+        "dim": "#3d434b",
+        "accent": "#9a4c4c",
+        "header": "#d46666",
+        "art": "#5a626a",
+        "plus": "#4a9d5a",
+        "minus": "#a8463e",
     },
     "light": {
         "bg": "#ffffff",
         "border": "#d0d7de",
         "fg": "#1f2328",
-        "label": "#cf222e",
-        "value": "#0969da",
-        "dim": "#8c959f",
-        "accent": "#cf222e",
-        "art": "#656d76",
-        "plus": "#1a7f37",
-        "minus": "#cf222e",
+        "label": "#9c1b24",
+        "value": "#154b8f",
+        "dim": "#7b838c",
+        "accent": "#9c1b24",
+        "header": "#c72a35",
+        "art": "#5a626a",
+        "plus": "#1a6e2c",
+        "minus": "#9c1b24",
     },
 }
 
@@ -307,7 +309,7 @@ def build_panel(s):
         )
     )
     L.append(("kv2", "commits", str(s["commits"]), "followers", str(s["followers"])))
-    L.append(("loc", "github loc", s["loc_net"], s["loc_add"], s["loc_del"]))
+    L.append(("loc", "github LoC", s["loc_net"], s["loc_add"], s["loc_del"]))
     return L
 
 
@@ -324,15 +326,21 @@ def render(stats, theme):
     panel = build_panel(stats)
     panel_h = len(panel)
 
-    rows = max(art_h, panel_h)
-    total_h = int(rows * line_h + pad_y * 2)
+    # art auto-scales so its rendered height matches the panel's rendered height
+    # horizontal stretch multiplier widens the art without affecting its vertical fit
+    panel_px_h = panel_h * line_h
+    art_px_h_natural = art_h * line_h
+    art_scale_y = panel_px_h / art_px_h_natural
+    art_stretch_x = 1.25
+    art_scale_x = art_scale_y * art_stretch_x
+    art_rendered_w = int(art_w * char_w * art_scale_x)
+
+    total_h = int(panel_px_h + pad_y * 2)
     art_x = pad_x
-    panel_x = int(pad_x + (art_w + 3) * char_w)
+    panel_x = int(pad_x + art_rendered_w + 3 * char_w)
     total_w = int(panel_x + (PANEL_CHARS + 2) * char_w + pad_x)
     base_y = pad_y + font_size
-    # vertically center the shorter block against the taller one
-    art_y_offset = max(0, (rows - art_h) // 2) * line_h
-    panel_y_offset = max(0, (rows - panel_h) // 2) * line_h
+    panel_y_offset = 0
 
     parts = [
         f'<svg xmlns="http://www.w3.org/2000/svg" '
@@ -341,12 +349,17 @@ def render(stats, theme):
         f'<rect x="0.5" y="0.5" width="{total_w-1}" height="{total_h-1}" rx="12" fill="{p["bg"]}" stroke="{p["border"]}"/>',
     ]
 
-    # ascii art on the left
+    # ascii art on the left, wrapped in a group that uniformly scales it
+    # to fit the panel height regardless of the source art's size
+    parts.append(
+        f'<g transform="translate({art_x}, {base_y}) scale({art_scale_x}, {art_scale_y})">'
+    )
     for i, line in enumerate(ART):
-        y = base_y + art_y_offset + i * line_h
+        y = i * line_h
         parts.append(
-            f'<text x="{art_x}" y="{y}" fill="{p["art"]}" stroke="{p["art"]}" stroke-width="0.9" paint-order="stroke fill" font-family="Menlo, Monaco, Courier New, monospace" font-weight="900" xml:space="preserve">{esc(line)}</text>'
+            f'<text x="0" y="{y}" fill="{p["art"]}" stroke="{p["art"]}" stroke-width="0.9" paint-order="stroke fill" font-family="Menlo, Monaco, Courier New, monospace" font-weight="900" xml:space="preserve">{esc(line)}</text>'
         )
+    parts.append("</g>")
 
     # build a dot-leader fill of exactly n characters using ". " pattern
     def dot_fill(n):
@@ -364,7 +377,7 @@ def render(stats, theme):
             txt = entry[1]
             trailing = max(0, PANEL_CHARS - len(txt) - 1)
             parts.append(
-                f'<text x="{panel_x}" y="{y}" fill="{p["accent"]}" font-weight="600" xml:space="preserve">'
+                f'<text x="{panel_x}" y="{y}" fill="{p["header"]}" font-weight="600" xml:space="preserve">'
                 f'{esc(txt)} <tspan fill="{p["dim"]}">{"─" * trailing}</tspan></text>'
             )
         elif kind == "section":
