@@ -10,7 +10,7 @@ import requests
 USER = os.environ.get("USER_NAME", "ra1ncs")
 TOKEN = os.environ["ACCESS_TOKEN"]
 BIRTH = datetime.date(2004, 10, 8)
-SHIPPING = "lucid @lucidapp"
+SHIPPING = "<stealth startup>"
 
 ART = Path("art.txt").read_text().rstrip("\n").splitlines()
 
@@ -110,12 +110,12 @@ THEMES = {
     "dark": {
         "bg": "#0d1117", "border": "#30363d",
         "fg": "#c9d1d9", "label": "#cc6666", "value": "#79b8ff",
-        "dim": "#6e7681", "accent": "#7ee787", "art": "#56d364",
+        "dim": "#6e7681", "accent": "#7ee787", "art": "#8b949e",
     },
     "light": {
         "bg": "#ffffff", "border": "#d0d7de",
         "fg": "#1f2328", "label": "#cf222e", "value": "#0969da",
-        "dim": "#8c959f", "accent": "#1a7f37", "art": "#1a7f37",
+        "dim": "#8c959f", "accent": "#1a7f37", "art": "#656d76",
     },
 }
 
@@ -125,38 +125,39 @@ def esc(s):
 # build the right-side neofetch panel as a list of typed lines
 def build_panel(s):
     L = []
-    L.append(("header", f"shreyan@ra1ncs"))
+    L.append(("header", "shreyan@ra1ncs"))
     L.append(("rule", None))
-    L.append(("kv", "OS", "Arch Linux x86_64"))
-    L.append(("kv", "Host", "Framework 13 (AMD Ryzen)"))
-    L.append(("kv", "Kernel", "Student (Drexel University) CS"))
-    L.append(("kv", "Uptime", uptime_str()))
-    L.append(("kv", "IDE", "Zed + tmux + ghostty + zsh + hubris"))
+    L.append(("kv", "currently.shipping", SHIPPING.lower()))
     L.append(("blank", None))
-    L.append(("kv", "Languages.Programming", "Python, TypeScript, Rust, C++"))
+    L.append(("kv", "identity.role", "student @ drexel university (cs)"))
+    L.append(("kv", "identity.uptime", uptime_str()))
+    L.append(("kv", "setup.daily", "macbook pro · m3 pro"))
+    L.append(("kv", "setup.heavy", "ryzen 6900hs + rtx 3070 ti"))
+    L.append(("kv", "tools.ide", "cursor / glass (zed) / subspace"))
+    L.append(("kv", "tools.shell", "ghostty + tmux + zsh"))
+    L.append(("blank", None))
+    L.append(("kv", "languages.programming", "python, typescript, rust, c++"))
     if s["top_langs"]:
-        top_str = ", ".join(f"{n} {p:.0f}%" for n, p in s["top_langs"])
-        L.append(("kv", "Languages.Top", top_str))
-    L.append(("kv", "Languages.Stack", "context engineering, model adaptation, inference infra"))
+        top_str = ", ".join(f"{n.lower()} {p:.0f}%" for n, p in s["top_langs"])
+        L.append(("kv", "languages.top", top_str))
+    L.append(("kv", "languages.stack", "context engineering, model adaptation, inference infra"))
     L.append(("blank", None))
-    L.append(("kv", "Hobbies.Software", "agentic systems, eval harnesses, RL post-training"))
-    L.append(("kv", "Hobbies.Setup", "terminal ricing, dotfile golf, homelab tinkering"))
-    L.append(("kv", "Hobbies.Markets", "day trading the open, options flow, microstructure"))
+    L.append(("kv", "hobbies.software", "agentic systems, eval harnesses, rl post-training"))
+    L.append(("kv", "hobbies.tinker", "terminal ricing, dotfile golf, homelab tinkering"))
+    L.append(("kv", "hobbies.markets", "day trading the open, options flow, microstructure"))
     L.append(("blank", None))
-    L.append(("kv", "Currently.Shipping", SHIPPING))
+    L.append(("section", "contact"))
+    L.append(("kv", "email.dev", "gshreyan.dev@gmail.com"))
+    L.append(("kv", "email.work", "gshreyan.work@gmail.com"))
+    L.append(("kv", "instagram", "gshreyan_"))
+    L.append(("kv", "discord", "demonlxrd"))
     L.append(("blank", None))
-    L.append(("section", "Contact"))
-    L.append(("kv", "Email.Dev", "gshreyan.dev@gmail.com"))
-    L.append(("kv", "Email.Work", "gshreyan.work@gmail.com"))
-    L.append(("kv", "Instagram", "gshreyan_"))
-    L.append(("kv", "Discord", "demonlxrd"))
-    L.append(("blank", None))
-    L.append(("section", "GitHub Stats"))
-    L.append(("kv", "Repos", f"{s['repos']} {{Contributed: {s['contributed']}}}"))
-    L.append(("kv", "Stars", str(s['stars'])))
-    L.append(("kv", "Followers", str(s['followers'])))
-    L.append(("kv", "Commits", str(s['commits'])))
-    L.append(("kv", "GitHub LOC", f"~{fmt_num(s['loc'])}"))
+    L.append(("section", "github stats"))
+    L.append(("kv", "repos", f"{s['repos']} {{contributed: {s['contributed']}}}"))
+    L.append(("kv", "stars", str(s['stars'])))
+    L.append(("kv", "followers", str(s['followers'])))
+    L.append(("kv", "commits", str(s['commits'])))
+    L.append(("kv", "github loc", f"~{fmt_num(s['loc'])}"))
     return L
 
 def render(stats, theme):
