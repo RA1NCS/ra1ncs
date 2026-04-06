@@ -13,6 +13,7 @@ BIRTH = datetime.date(2004, 10, 8)
 SHIPPING = "<stealth startup>"
 
 ART = Path("art.txt").read_text().rstrip("\n").splitlines()
+CACHE_PATH = Path("cache/loc_cache.txt")
 
 GQL_URL = "https://api.github.com/graphql"
 HEADERS = {"Authorization": f"bearer {TOKEN}"}
@@ -46,11 +47,68 @@ def uptime_str():
         m += 12
     return f"{y} years, {m} months, {d} days"
 
-# pull repos, langs, contribs in one query
+# load per-repo loc cache (skips re-fetching unchanged repos)
+def load_cache():
+    cache = {}
+    if CACHE_PATH.exists():
+        for line in CACHE_PATH.read_text().splitlines():
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            parts = line.split("\t")
+            if len(parts) == 4:
+                name, sha, a, d = parts
+                cache[name] = (sha, int(a), int(d))
+    return cache
+
+def save_cache(cache):
+    CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    lines = ["# repo<TAB>head_sha<TAB>additions<TAB>deletions"]
+    for name, (sha, a, d) in sorted(cache.items()):
+        lines.append(f"{name}\t{sha}\t{a}\t{d}")
+    CACHE_PATH.write_text("\n".join(lines) + "\n")
+
+# walk every commit on the default branch authored by user, sum add/del
+def fetch_repo_loc(owner, name, user_id):
+    add_total = 0
+    del_total = 0
+    cursor = None
+    q = """
+    query($owner: String!, $name: String!, $userId: ID!, $cursor: String) {
+      repository(owner: $owner, name: $name) {
+        defaultBranchRef {
+          target {
+            ... on Commit {
+              history(author: {id: $userId}, first: 100, after: $cursor) {
+                pageInfo { hasNextPage endCursor }
+                nodes { additions deletions }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+    while True:
+        d = gql(q, {"owner": owner, "name": name, "userId": user_id, "cursor": cursor})
+        ref = d["repository"]["defaultBranchRef"]
+        if not ref or not ref["target"]:
+            return 0, 0
+        hist = ref["target"]["history"]
+        for n in hist["nodes"]:
+            add_total += n["additions"]
+            del_total += n["deletions"]
+        if not hist["pageInfo"]["hasNextPage"]:
+            break
+        cursor = hist["pageInfo"]["endCursor"]
+    return add_total, del_total
+
+# pull repos, langs, contribs in one query then per-repo loc with caching
 def fetch_stats():
     q = """
     query($login: String!) {
       user(login: $login) {
+        id
         followers { totalCount }
         repositoriesContributedTo(first: 1, contributionTypes: [COMMIT, PULL_REQUEST, ISSUE, REPOSITORY]) {
           totalCount
@@ -62,16 +120,19 @@ def fetch_stats():
         repositories(first: 100, ownerAffiliations: OWNER, isFork: false, orderBy: {field: UPDATED_AT, direction: DESC}) {
           totalCount
           nodes {
+            nameWithOwner
             stargazerCount
             languages(first: 10, orderBy: {field: SIZE, direction: DESC}) {
               edges { size node { name } }
             }
+            defaultBranchRef { target { ... on Commit { oid } } }
           }
         }
       }
     }
     """
     d = gql(q, {"login": USER})["user"]
+    user_id = d["id"]
     repos = d["repositories"]["nodes"]
     stars = sum(r["stargazerCount"] for r in repos)
 
@@ -85,8 +146,26 @@ def fetch_stats():
     top = sorted(lang_bytes.items(), key=lambda x: -x[1])[:3]
     top_langs = [(n, b / total_bytes * 100) for n, b in top] if total_bytes else []
 
-    # rough loc estimate from total bytes (~40 chars/line)
-    loc = total_bytes // 40
+    # per-repo loc with cache: skip if head sha unchanged
+    cache = load_cache()
+    new_cache = {}
+    for r in repos:
+        full = r["nameWithOwner"]
+        ref = r["defaultBranchRef"]
+        if not ref or not ref["target"]:
+            continue
+        head = ref["target"]["oid"]
+        if full in cache and cache[full][0] == head:
+            new_cache[full] = cache[full]
+            continue
+        owner, name = full.split("/", 1)
+        a, dl = fetch_repo_loc(owner, name, user_id)
+        new_cache[full] = (head, a, dl)
+    save_cache(new_cache)
+
+    add_total = sum(v[1] for v in new_cache.values())
+    del_total = sum(v[2] for v in new_cache.values())
+    net_loc = add_total - del_total
 
     return {
         "repos": d["repositories"]["totalCount"],
@@ -95,7 +174,9 @@ def fetch_stats():
         "followers": d["followers"]["totalCount"],
         "commits": d["contributionsCollection"]["totalCommitContributions"]
                  + d["contributionsCollection"]["restrictedContributionsCount"],
-        "loc": loc,
+        "loc_net": net_loc,
+        "loc_add": add_total,
+        "loc_del": del_total,
         "top_langs": top_langs,
     }
 
@@ -157,7 +238,7 @@ def build_panel(s):
     L.append(("kv", "stars", str(s['stars'])))
     L.append(("kv", "followers", str(s['followers'])))
     L.append(("kv", "commits", str(s['commits'])))
-    L.append(("kv", "github loc", f"~{fmt_num(s['loc'])}"))
+    L.append(("kv", "github loc", f"{s['loc_net']:,} ( +{fmt_num(s['loc_add'])}, -{fmt_num(s['loc_del'])} )"))
     return L
 
 def render(stats, theme):
