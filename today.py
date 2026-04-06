@@ -270,7 +270,6 @@ def esc(s):
 def build_panel(s):
     L = []
     L.append(("header", "shreyan@ra1ncs"))
-    L.append(("blank", None))
     L.append(("kv", "currently.shipping", SHIPPING.lower()))
     L.append(("blank", None))
     L.append(("kv", "identity.role", "student @ drexel university (cs)"))
