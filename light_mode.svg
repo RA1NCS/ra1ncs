@@ -31,7 +31,7 @@
 <text x="28" y="526" fill="#656d76" stroke="#656d76" stroke-width="0.9" paint-order="stroke fill" font-family="Menlo, Monaco, Courier New, monospace" font-weight="900" xml:space="preserve">            = -+--:-=+-++.* @-% + +:   @   @@@ :@@@@+**+%#+*@@  .  ..+@@*             </text>
 <text x="28" y="544" fill="#656d76" stroke="#656d76" stroke-width="0.9" paint-order="stroke fill" font-family="Menlo, Monaco, Courier New, monospace" font-weight="900" xml:space="preserve">          .-.-* -#.-**++==* %+# #:# +#=+   =@ #:#% +*-+=*+-=+@@  ++=     *@@@%:       </text>
 <text x="28" y="562" fill="#656d76" stroke="#656d76" stroke-width="0.9" paint-order="stroke fill" font-family="Menlo, Monaco, Courier New, monospace" font-weight="900" xml:space="preserve">          -: #.-#:===#.%=+ :*%.=:.@ = -+  :  + -#  #@*++#%##*@@@   @@@%#- + :=+%@     </text>
-<text x="28" y="580" fill="#656d76" stroke="#656d76" stroke-width="0.9" paint-order="stroke fill" font-family="Menlo, Monaco, Courier New, monospace" font-weight="900" xml:space="preserve">       -=-.# +:+=-#= *##-* +#%-#+-# * @% :: #  %+ :.@*-+*+*+++%@@=  ::                </text>
+<text x="28" y="580" fill="#656d76" stroke="#656d76" stroke-width="0.9" paint-order="stroke fill" font-family="Menlo, Monaco, Courier New, monospace" font-weight="900" xml:space="preserve">       -=-.# +:+=-#= *##-* +#%-#+-# * @% :: #  %+ :.@*-+*+*+++%@@=  :: @@+  *- =- :</text>
 <text x="784" y="40" fill="#1a7f37" font-weight="600">shreyan@ra1ncs</text>
 <line x1="784" y1="54" x2="1372" y2="54" stroke="#8c959f" stroke-width="1"/>
 <text x="784" y="76" xml:space="preserve"><tspan fill="#8c959f">. </tspan><tspan fill="#cf222e">currently.shipping:</tspan><tspan fill="#0969da"> &lt;stealth startup&gt;</tspan></text>
@@ -56,6 +56,6 @@
 <text x="784" y="508" xml:space="preserve"><tspan fill="#8c959f">. </tspan><tspan fill="#cf222e">repos:</tspan><tspan fill="#0969da"> 39 {contributed: 2}</tspan></text>
 <text x="784" y="526" xml:space="preserve"><tspan fill="#8c959f">. </tspan><tspan fill="#cf222e">stars:</tspan><tspan fill="#0969da"> 28</tspan></text>
 <text x="784" y="544" xml:space="preserve"><tspan fill="#8c959f">. </tspan><tspan fill="#cf222e">followers:</tspan><tspan fill="#0969da"> 6</tspan></text>
-<text x="784" y="562" xml:space="preserve"><tspan fill="#8c959f">. </tspan><tspan fill="#cf222e">commits:</tspan><tspan fill="#0969da"> 464</tspan></text>
+<text x="784" y="562" xml:space="preserve"><tspan fill="#8c959f">. </tspan><tspan fill="#cf222e">commits:</tspan><tspan fill="#0969da"> 465</tspan></text>
 <text x="784" y="580" xml:space="preserve"><tspan fill="#8c959f">. </tspan><tspan fill="#cf222e">github loc:</tspan><tspan fill="#0969da"> 4,649,566 ( +5.32M, -667.2K )</tspan></text>
 </svg>
