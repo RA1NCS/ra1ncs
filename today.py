@@ -189,7 +189,7 @@ def render(stats, theme):
     for i, line in enumerate(ART):
         y = base_y + i * line_h
         parts.append(
-            f'<text x="{art_x}" y="{y}" fill="{p["art"]}" font-family="Courier New, Courier, monospace" font-weight="700" xml:space="preserve">{esc(line)}</text>'
+            f'<text x="{art_x}" y="{y}" fill="{p["art"]}" font-family="Menlo, Monaco, Courier New, monospace" font-weight="900" xml:space="preserve">{esc(line)}</text>'
         )
 
     # neofetch panel on the right
@@ -225,6 +225,16 @@ def main():
     s = fetch_stats()
     Path("dark_mode.svg").write_text(render(s, "dark"))
     Path("light_mode.svg").write_text(render(s, "light"))
+    # bust github camo cache by stamping a unique query param into the readme
+    v = int(datetime.datetime.utcnow().timestamp())
+    readme = (
+        '<picture>\n'
+        f'  <source media="(prefers-color-scheme: dark)" srcset="dark_mode.svg?v={v}">\n'
+        f'  <source media="(prefers-color-scheme: light)" srcset="light_mode.svg?v={v}">\n'
+        f'  <img alt="shreyan@ra1ncs" src="dark_mode.svg?v={v}">\n'
+        '</picture>\n'
+    )
+    Path("README.md").write_text(readme)
     print("ok:", s)
 
 if __name__ == "__main__":
