@@ -189,7 +189,7 @@ def render(stats, theme):
     for i, line in enumerate(ART):
         y = base_y + i * line_h
         parts.append(
-            f'<text x="{art_x}" y="{y}" fill="{p["art"]}" xml:space="preserve">{esc(line)}</text>'
+            f'<text x="{art_x}" y="{y}" fill="{p["art"]}" font-family="Courier New, Courier, monospace" font-weight="700" xml:space="preserve">{esc(line)}</text>'
         )
 
     # neofetch panel on the right
