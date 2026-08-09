@@ -1,5 +1,5 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="dark_mode.svg?v=1786258431">
-  <source media="(prefers-color-scheme: light)" srcset="light_mode.svg?v=1786258431">
-  <img alt="shreyan@ra1ncs" src="dark_mode.svg?v=1786258431">
+  <source media="(prefers-color-scheme: dark)" srcset="dark_mode.svg?v=1786279588">
+  <source media="(prefers-color-scheme: light)" srcset="light_mode.svg?v=1786279588">
+  <img alt="shreyan@ra1ncs" src="dark_mode.svg?v=1786279588">
 </picture>
